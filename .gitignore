@@ -1,0 +1,27 @@
+# macOS
+.DS_Store
+
+# Xcode / XcodeGen (project is generated from project.yml)
+*.xcodeproj
+xcuserdata/
+DerivedData/
+*.xcworkspace/xcuserdata/
+
+# SwiftPM
+.build/
+.swiftpm/
+Package.resolved
+
+# Personal signing overrides (see Config/Local.xcconfig.example)
+Config/Local.xcconfig
+
+# Local build output and manual-check screenshots
+build/
+screenshots/
+
+# Private working material, kept on disk but not published
+docs/plans/
+docs/design/
+CLAUDE.md
+AGENTS.md
+.claude/

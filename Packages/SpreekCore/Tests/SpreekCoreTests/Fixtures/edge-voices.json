@@ -1,0 +1,59 @@
+[
+ {
+  "Name": "Microsoft Server Speech Text to Speech Voice (nl-NL, FennaNeural)",
+  "ShortName": "nl-NL-FennaNeural",
+  "Gender": "Female",
+  "Locale": "nl-NL",
+  "LocaleName": "Dutch (Netherlands)",
+  "SuggestedCodec": "audio-24khz-48kbitrate-mono-mp3",
+  "FriendlyName": "Microsoft Fenna Online (Natural) - Dutch (Netherlands)",
+  "Status": "GA",
+  "VoiceTag": {
+   "ContentCategories": [
+    "General"
+   ],
+   "VoicePersonalities": [
+    "Friendly",
+    "Positive"
+   ]
+  }
+ },
+ {
+  "Name": "Microsoft Server Speech Text to Speech Voice (de-DE, FlorianMultilingualNeural)",
+  "ShortName": "de-DE-FlorianMultilingualNeural",
+  "Gender": "Male",
+  "Locale": "de-DE",
+  "LocaleName": "German (Germany)",
+  "SuggestedCodec": "audio-24khz-48kbitrate-mono-mp3",
+  "FriendlyName": "Microsoft FlorianMultilingual Online (Natural) - German (Germany)",
+  "Status": "GA",
+  "VoiceTag": {
+   "ContentCategories": [
+    "General"
+   ],
+   "VoicePersonalities": [
+    "Friendly",
+    "Positive"
+   ]
+  }
+ },
+ {
+  "Name": "Microsoft Server Speech Text to Speech Voice (ja-JP, NanamiNeural)",
+  "ShortName": "ja-JP-NanamiNeural",
+  "Gender": "Female",
+  "Locale": "ja-JP",
+  "LocaleName": "Japanese (Japan)",
+  "SuggestedCodec": "audio-24khz-48kbitrate-mono-mp3",
+  "FriendlyName": "Microsoft Nanami Online (Natural) - Japanese (Japan)",
+  "Status": "GA",
+  "VoiceTag": {
+   "ContentCategories": [
+    "General"
+   ],
+   "VoicePersonalities": [
+    "Friendly",
+    "Positive"
+   ]
+  }
+ }
+]

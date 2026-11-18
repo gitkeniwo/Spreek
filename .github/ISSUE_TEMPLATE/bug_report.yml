@@ -1,0 +1,25 @@
+name: Bug report
+description: Something doesn't work as expected
+labels: [bug]
+body:
+  - type: input
+    id: macos
+    attributes: { label: macOS version, placeholder: "15.2" }
+    validations: { required: true }
+  - type: input
+    id: version
+    attributes: { label: Spreek version, description: "`brew list --versions spreek`, or Finder › Get Info on Spreek.app." }
+    validations: { required: true }
+  - type: input
+    id: voice
+    attributes: { label: Language and voice, placeholder: "Dutch, nl-NL-FennaNeural" }
+  - type: textarea
+    id: what
+    attributes: { label: What happened, description: "What you expected and what you saw instead. Steps to reproduce help." }
+    validations: { required: true }
+  - type: textarea
+    id: log
+    attributes:
+      label: Log excerpt
+      description: "From `log show --last 5m --predicate 'subsystem == \"nl.spreek.app\"'`. Remove anything private."
+      render: text

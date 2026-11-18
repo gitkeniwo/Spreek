@@ -1,0 +1,375 @@
+<title>Snavel Varianten</title>
+<style>
+/* Layout: mixer on top (one big icon + four chip rows), then contact-sheet grids comparing one axis at a time. */
+:root{
+  --bg:#F2F2F5; --card:#FFFFFF; --fg:#1D1D1F; --fg2:#5E5E66; --fg3:#8E8E96; --line:rgba(0,0,0,.08);
+  --accent:#0A64D6; --chip:#ECECF0; --chipfg:#3A3A40;
+  --mb-light:#ECECEF; --mb-light-fg:#1D1D1F; --mb-dark:#2A2A2E; --mb-dark-fg:#F2F2F7;
+  --round: ui-rounded, "SF Pro Rounded", system-ui, sans-serif;
+  --body: -apple-system, BlinkMacSystemFont, "SF Pro Text", "PingFang SC", system-ui, sans-serif;
+  --mono: ui-monospace, "SF Mono", Menlo, monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#161618; --card:#222226; --fg:#F2F2F7; --fg2:#B4B4BC; --fg3:#7C7C86; --line:rgba(255,255,255,.08);
+  --accent:#4C93F2; --chip:#2E2E33; --chipfg:#D8D8DE; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#161618; --card:#222226; --fg:#F2F2F7; --fg2:#B4B4BC; --fg3:#7C7C86; --line:rgba(255,255,255,.08);
+  --accent:#4C93F2; --chip:#2E2E33; --chipfg:#D8D8DE; color-scheme:dark}
+body{background:var(--bg);color:var(--fg);font-family:var(--body);font-size:14px;line-height:1.55}
+.wrap{max-width:1100px;margin:0 auto;padding-inline:20px;padding-block:40px 64px}
+h1{font-family:var(--round);font-weight:900;font-size:34px;margin:0 0 6px;letter-spacing:-.01em}
+h2{font-family:var(--round);font-weight:900;font-size:22px;margin:48px 0 2px}
+.lede{color:var(--fg2);max-width:66ch;margin:0}
+.sub{color:var(--fg3);margin:0 0 16px;max-width:72ch}
+.ic{filter:drop-shadow(0 5px 9px rgba(0,0,0,.18)) drop-shadow(0 1px 2px rgba(0,0,0,.12));display:block}
+button.tile{all:unset;cursor:pointer;border-radius:22%;display:block}
+button.tile:focus-visible{outline:2px solid var(--accent);outline-offset:3px}
+button.tile:hover .ic{transform:translateY(-2px)}
+.ic{transition:transform .15s}
+@media (prefers-reduced-motion:reduce){.ic{transition:none}}
+
+/* mixer */
+.mixer{background:var(--card);border:.5px solid var(--line);border-radius:22px;padding:22px;margin-top:24px;display:grid;grid-template-columns:auto 1fr;gap:28px}
+.stage{display:flex;flex-direction:column;align-items:center;gap:14px;min-width:0}
+.stage .hero{width:190px;height:190px}
+.ladder{display:flex;align-items:flex-end;gap:12px}
+.ladder > div{display:flex;flex-direction:column;align-items:center;gap:3px}
+.lbl{font-family:var(--mono);font-size:10.5px;color:var(--fg3)}
+.controls{display:flex;flex-direction:column;gap:14px;min-width:0}
+.row h4{margin:0 0 6px;font-family:var(--round);font-weight:800;font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--fg3)}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{all:unset;cursor:pointer;background:var(--chip);color:var(--chipfg);border-radius:8px;padding:4px 10px;font-size:13px;font-weight:600;display:inline-flex;align-items:center;gap:6px}
+.chip:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.chip[aria-pressed="true"]{background:var(--accent);color:#fff}
+.sw{width:12px;height:12px;border-radius:4px;flex:none;box-shadow:inset 0 0 0 .5px rgba(0,0,0,.2)}
+.desc{color:var(--fg2);font-size:13px;margin:0;min-height:2.6em}
+.mb{display:grid;grid-template-columns:1fr 1fr;gap:8px;width:100%}
+.bar{height:26px;border-radius:7px;display:flex;align-items:center;justify-content:flex-end;gap:10px;padding:0 10px;font-size:12.5px;font-weight:500}
+.bar.l{background:var(--mb-light);color:var(--mb-light-fg);--hole:var(--mb-light)}
+.bar.d{background:var(--mb-dark);color:var(--mb-dark-fg);--hole:var(--mb-dark)}
+.bar svg{width:18px;height:18px;flex:none}
+.bar .clock{font-variant-numeric:tabular-nums;white-space:nowrap}
+.zoom{display:flex;gap:10px;align-items:center;font-family:var(--mono);font-size:10.5px;color:var(--fg3);--hole:var(--bg)}
+.zoom svg{width:54px;height:54px;color:var(--fg);background:var(--bg);border-radius:8px}
+
+/* ship list */
+.ship{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:14px;margin-top:8px}
+.shipcard{background:var(--card);border:.5px solid var(--line);border-radius:18px;padding:16px;display:grid;grid-template-columns:auto 1fr;gap:16px;align-items:center}
+.shipcard .side{display:flex;flex-direction:column;gap:8px;min-width:0}
+.state{display:inline-block;font-family:var(--round);font-weight:800;font-size:11px;padding:1px 8px;border-radius:8px;margin-left:6px;vertical-align:2px;background:var(--chip);color:var(--fg2)}
+.state.done{background:#D9F0D6;color:#1E5B2A}
+.state.new{background:#FBEBC6;color:#7A4F00}
+.shipcard .mb{grid-template-columns:1fr}
+.shipcard .bar{justify-content:flex-start}
+/* bird cards */
+.birds{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:14px}
+.bird{background:var(--card);border:.5px solid var(--line);border-radius:18px;padding:16px;display:flex;gap:14px;align-items:flex-start}
+.bird .meta{min-width:0}
+.name{font-family:var(--round);font-weight:900;font-size:17px;line-height:1.2}
+.nl{font-family:var(--mono);font-size:11px;color:var(--fg3)}
+.fame{color:var(--fg2);font-size:12.5px;margin:4px 0 0}
+
+/* matrices */
+.matrix{background:var(--card);border:.5px solid var(--line);border-radius:18px;padding:18px;overflow-x:auto}
+.matrix table{border-collapse:separate;border-spacing:14px 10px}
+.matrix th{font-family:var(--round);font-weight:800;font-size:12.5px;color:var(--fg2);text-align:center;white-space:nowrap}
+.matrix th.rowh{text-align:right}
+.matrix td{text-align:center}
+
+.note{background:var(--card);border-radius:18px;padding:18px 20px;margin-top:28px;border:.5px solid var(--line)}
+.note h3{font-family:var(--round);font-weight:900;font-size:17px;margin:0 0 6px}
+.note li{color:var(--fg2);max-width:74ch}
+.note ul{margin:0;padding-left:18px}
+@media (max-width:640px){.mixer{grid-template-columns:1fr}.stage .hero{width:150px;height:150px}}
+</style>
+
+<svg id="defs" width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+  <clipPath id="sq"><rect width="100" height="100" rx="22.4"/></clipPath>
+  <linearGradient id="gShine" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff" stop-opacity=".2"/><stop offset=".5" stop-color="#fff" stop-opacity="0"/></linearGradient>
+  <radialGradient id="hs" cx=".32" cy=".26" r=".8"><stop offset="0" stop-color="#fff" stop-opacity=".26"/><stop offset=".6" stop-color="#fff" stop-opacity="0"/></radialGradient>
+  <linearGradient id="gOr" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FFA23A"/><stop offset="1" stop-color="#EE6A0C"/></linearGradient>
+  <linearGradient id="gRust" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#E9894A"/><stop offset="1" stop-color="#C9622A"/></linearGradient>
+  <linearGradient id="gGrey" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#C9CED7"/><stop offset="1" stop-color="#959CA8"/></linearGradient>
+  <linearGradient id="gGodwit" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#F3A99E"/><stop offset=".55" stop-color="#E08880"/><stop offset=".8" stop-color="#3A3034"/><stop offset="1" stop-color="#1E1A1C"/></linearGradient>
+  <linearGradient id="gCuckoo" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#F6C445"/><stop offset=".35" stop-color="#E0A92E"/><stop offset=".5" stop-color="#2E2E33"/><stop offset="1" stop-color="#1E1E22"/></linearGradient>
+</defs></svg>
+
+<div class="wrap">
+  <h1>Snavel 变体</h1>
+  <p class="lede">沿着“喙特写”继续展开：选了 11 种以叫声闻名的鸟，头可以放在左上、左、左下（面朝右上），声音有 7 种画法，背景有 11 种配色。最上面的混搭器可以自由组合；下面的格子每次只改变一个维度，方便横向比较。点任何一个图标，都会把它载入混搭器。</p>
+
+  <h2>Ship 列表</h2>
+  <p class="sub">六只定稿。每个 Dock 图标都和自己的菜单栏图标绑定，切换时一起换。菜单栏里鸟的朝向和 Dock 图标一致，裁切只框住眼睛、喙和声音，头从同一侧把画面填满。</p>
+  <div class="ship" id="ship"></div>
+
+  <h2>混搭器</h2>
+  <section class="mixer" aria-label="混搭器">
+    <div class="stage">
+      <div id="hero"></div>
+      <div class="ladder" id="ladder"></div>
+      <div class="mb">
+        <div class="bar l"><span id="g1"></span><span class="clock">do 15 okt 16:40</span></div>
+        <div class="bar d"><span id="g2"></span><span class="clock">do 15 okt 16:40</span></div>
+      </div>
+      <div class="zoom"><span id="g3"></span>菜单栏图标 · 放大 3×</div>
+    </div>
+    <div class="controls">
+      <div class="row"><h4>鸟</h4><div class="chips" id="c-bird"></div></div>
+      <p class="desc" id="bird-desc"></p>
+      <div class="row"><h4>头的位置</h4><div class="chips" id="c-pos"></div></div>
+      <div class="row"><h4>声音</h4><div class="chips" id="c-wave"></div></div>
+      <div class="row"><h4>背景</h4><div class="chips" id="c-bg"></div></div>
+    </div>
+  </section>
+
+  <h2>以叫声闻名的鸟</h2>
+  <p class="sub">每种鸟用我觉得最适合它的组合。一张卡片里有 App 图标和菜单栏单色图标。</p>
+  <div class="birds" id="birds"></div>
+
+  <h2>头的位置</h2>
+  <p class="sub">同一只鸟，头从左上、左、左下探进来。左下时面朝右上，像仰头开口。</p>
+  <div class="matrix" id="m-pos"></div>
+
+  <h2>声音的画法</h2>
+  <p class="sub">声波弧是基础款。波形条和现在的图标一脉相承；涟漪比较安静；气泡和喊叫线更像漫画。</p>
+  <div class="matrix" id="m-wave"></div>
+
+  <h2>背景配色</h2>
+  <p class="sub">蓝是 App 现在的强调色。橙是荷兰橙；黄和粉来自 Dashboard 里收藏星标和收听图表的颜色。</p>
+  <div class="matrix" id="m-bg"></div>
+
+  <div class="note">
+    <h3>看图时可以注意</h3>
+    <ul>
+      <li><b>16 px 和菜单栏</b>：头越大、嘴的开口越明显，缩小后越好认。钩嘴（鹦鹉）、粗直嘴（渡鸦、笑翠鸟）和鸡冠（公鸡）的剪影最强；细长嘴（大杜鹃、夜莺）缩小后容易变成一根线。</li>
+      <li><b>左下（仰头）</b>最有“开口说话”的动势，头也露得最多，眼睛不会贴边。</li>
+      <li><b>浅色背景</b>（纸白）在 Dock 里很醒目，但菜单栏图标与 App 图标的关系会弱一点。</li>
+      <li>这些都是参数化的 SVG 草图。选定之后，我会按 macOS 图标网格手动修整曲线，再画一个专门优化过的 18 pt 菜单栏版本。</li>
+    </ul>
+  </div>
+</div>
+
+<script>
+/* ---------- backgrounds ---------- */
+const BG={
+  blauw:{label:"蓝",stops:["#3D8EF8","#0A5CC8"],wave:"#FFFFFF"},
+  oranje:{label:"荷兰橙",stops:["#FFA040","#EE5F06"],wave:"#FFFFFF"},
+  nacht:{label:"夜蓝",stops:["#27489A","#0C1A44"],wave:"#FFD27A"},
+  papier:{label:"纸白",stops:["#FFFFFF","#E6EAF1"],wave:"#0A64D6"},
+  teal:{label:"青绿",stops:["#2CC6B0","#0B8A80"],wave:"#FFFFFF"},
+  roze:{label:"粉",stops:["#F777B0","#D2387E"],wave:"#FFFFFF"},
+  paars:{label:"紫",stops:["#A58BFA","#6B47DE"],wave:"#FFFFFF"},
+  zwart:{label:"石墨",stops:["#3A3A40","#111114"],wave:"#FFFFFF"},
+  geel:{label:"金黄",stops:["#FFD95A","#F2AE14"],wave:"#1D1D1F"},
+  woud:{label:"夜林",stops:["#2F6E66","#0F3034"],wave:"#F6E6C4",
+    deco:`<circle cx="84" cy="14" r="1.3" fill="#F6E6C4" opacity=".7"/><circle cx="70" cy="8" r=".9" fill="#F6E6C4" opacity=".5"/><circle cx="92" cy="30" r="1" fill="#F6E6C4" opacity=".45"/><path d="M18 14 a8 8 0 1 0 8 10 a6.2 6.2 0 1 1 -8 -10 Z" fill="#F6E6C4" opacity=".85"/>`},
+  schemer:{label:"晚霞",stops:["#2A2352","#553A7A","#A04E80","#D9617A","#EE8270"],wave:"#FFF1D0",
+    deco:`<path d="M0 74 Q50 68 100 76" stroke="#FFD9C0" stroke-width="1.1" fill="none" opacity=".3"/><path d="M0 84 Q50 79 100 86" stroke="#FFD9C0" stroke-width="1.1" fill="none" opacity=".2"/>`}
+};
+const defs=document.querySelector("#defs defs");
+defs.insertAdjacentHTML("beforeend",Object.entries(BG).map(([k,b])=>
+  `<linearGradient id="bg-${k}" x1="0" y1="0" x2="0" y2="1">${b.stops.map((s,i)=>`<stop offset="${i/(b.stops.length-1)}" stop-color="${s}"/>`).join("")}</linearGradient>`).join(""));
+
+/* ---------- beaks (canonical: head centre at 0,0, radius 40, facing +x) ---------- */
+function straight(L,T){const b=26,t=b+L;return{
+  u:`M${b} ${-24*T} C${b+L*.45} ${-24*T} ${b+L*.8} ${-14*T} ${t} -4 C${b+L*.6} -3 ${b+L*.3} -2 ${b} -2 Z`,
+  l:`M${b} 4 C${b+L*.4} 4 ${b+L*.7} 6 ${b+L*.85} ${6+5*T} C${b+L*.6} ${6+12*T} ${b+L*.3} ${4+16*T} ${b} ${4+16*T} Z`,
+  tip:t,my:2};}
+const hooked={u:"M32 -22 C50 -26 66 -14 64 9 C63.5 15 57.5 16 56.5 10.5 C55.5 0 48 -5.5 32 -4 Z",
+  l:"M35 2 C45 2 52 6 54 14 C46 20 38 20 35 14 Z",tip:62,my:5};
+
+/* ---------- birds ---------- */
+const BIRDS={
+  snavel:{name:"Snavel",nl:"原版 · 抽象白鸟",fame:"上一轮的原型，作为对照。",
+    head:"#F5F7FB",beak:straight(46,1),uf:"url(#gOr)",lf:"#E4600A",
+    glyph:{bs:.6,hx:0,eyeR:8.4},def:["left","arcs","blauw"]},
+  ara:{name:"Ara",nl:"de ara · 绯红金刚鹦鹉",fame:"雨林里嗓门最大的鸟之一，也会学人说话。白色裸脸加象牙色钩嘴，辨识度很高。",
+    head:"#E2302D",beak:hooked,uf:"#F2EADF",lf:"#1E1E22",
+    over:`<ellipse cx="18" cy="-11" rx="15" ry="12.5" fill="#F7F2EE"/><path d="M7 -5 Q13 -3 19 -5 M9 0 Q15 2 21 0" stroke="#E2302D" stroke-width="1.4" fill="none" stroke-linecap="round" opacity=".75"/>`,
+    eye:{x:20,y:-13,iris:"#F3D46B"},glyph:{bs:.6,hx:0,dx:-9,eyeR:10},def:["left","arcs","teal"]},
+  grijs:{name:"Grijze roodstaart",nl:"非洲灰鹦鹉",fame:"公认最会说话的鸟，能记住上百个词。用它代表跟读最贴切。",
+    head:"url(#gGrey)",beak:hooked,uf:"#2A2A30",lf:"#3A3A42",
+    over:`<ellipse cx="18" cy="-11" rx="15" ry="12" fill="#ECEEF2"/>`,eye:{x:20,y:-12,iris:"#F4E4A8"},def:["bl","bubble","geel"]},
+  beo:{name:"Beo",nl:"de beo · 鹩哥",fame:"声音清晰度胜过鹦鹉，模仿人声几乎可以乱真。黑羽、黄色肉垂、橙色嘴。",
+    head:"#17171C",beak:straight(40,.9),uf:"#FF8A1F",lf:"#FFB21F",
+    over:`<path d="M-6 -32 Q10 -38 24 -28" stroke="#7C67E6" stroke-width="2.6" fill="none" opacity=".55" stroke-linecap="round"/><path d="M2 -8 C8 -18 16 -10 12 -2 C10 4 14 10 8 14 C2 12 -2 2 2 -8 Z" fill="#FFD23F"/>`,
+    eye:{x:21,y:-12,ring:"#3A3A44",ringR:6},def:["bl","bars","paars"]},
+  haan:{name:"Haan",nl:"de haan · 公鸡 · kukeleku!",fame:"荷兰语里公鸡叫 “kukeleku”。每种语言的拟声词都不一样，这本身就是语言学习的梗。",
+    head:"#F7F4EE",beak:straight(24,.8),uf:"#F6B21A",lf:"#E39A0C",
+    under:`<path d="M-18 -30 C-24 -48 -10 -54 -4 -40 C-4 -58 12 -60 12 -42 C18 -56 34 -50 26 -32 Z" fill="#E8312F"/>`,
+    over:`<ellipse cx="20" cy="-8" rx="13" ry="12" fill="#F25A48"/>`,
+    top:`<path d="M30 12 C40 12 44 24 38 34 C32 42 24 34 26 22 Z" fill="#E8312F"/>`,
+    eye:{x:21,y:-10,iris:"#F6A01A"},def:["bl","burst","blauw"]},
+  koekoek:{name:"Koekoek",nl:"de koekoek · 大杜鹃",fame:"叫声就是自己的名字 “koekoek”。荷兰语、德语、日语里的叫法都差不多。",
+    head:"#8E98A6",beak:straight(34,.55),uf:"url(#gCuckoo)",lf:"url(#gCuckoo)",
+    eye:{x:20,y:-12,ring:"#F6C445",ringR:7,iris:"#F6C445"},def:["tl","dots","papier"]},
+  nachtegaal:{name:"Nachtegaal",nl:"de nachtegaal · 夜莺",fame:"歌声最复杂的鸟，曲目超过 200 种。暖棕色，适合安静一点的气质。",
+    head:"#A87650",beak:straight(30,.45),uf:"#5B4130",lf:"#7A5A44",
+    over:`<path d="M16 13 C26 11 34 12 44 14 L44 34 C32 32 22 24 16 13 Z" fill="#EBDCC8"/>`,
+    eye:{x:20,y:-12,ring:"#F2E6D4",ringR:6.6},def:["bl","ripples","woud"]},
+  grutto:{name:"Grutto",nl:"de grutto · 黑尾塍鹬",fame:"荷兰国鸟，叫声 “grut-to” 就是它的名字。",
+    head:"url(#gRust)",beak:straight(56,.38),uf:"url(#gGodwit)",lf:"url(#gGodwit)",
+    over:`<path d="M6 -24 Q18 -30 32 -22" stroke="#F5D9B8" stroke-width="2.6" fill="none" stroke-linecap="round"/>`,def:["left","arcs","blauw"]},
+  merel:{name:"Merel",nl:"de merel · 乌鸫",fame:"荷兰城市里黄昏站在屋顶唱歌的那只。黑羽配亮黄嘴。",
+    head:"#141418",beak:straight(36,.75),uf:"#FFB21F",lf:"#FFC94A",bs:"#141418",
+    eye:{x:20,y:-12,ring:"#FFB21F",ringR:6.4},def:["bl","arcs","schemer"]},
+  raaf:{name:"Raaf",nl:"de raaf · 渡鸦",fame:"会说话的鸦科鸟，嘴很粗，很有分量。黑色剪影在浅底上非常干脆。",
+    r:47,head:"#1C1D24",beak:straight(44,1.15),uf:"#2C2D35",lf:"#15151A",
+    over:`<path d="M-4 -38 Q14 -44 32 -30" stroke="#5A7BD8" stroke-width="2.8" fill="none" opacity=".6" stroke-linecap="round"/>`,
+    eye:{x:22,y:-14,ring:"#D4D7E0",ringR:7.4,iris:"#2A1E16"},def:["tl","manga","papier"]},
+  kookaburra:{name:"Kookaburra",nl:"笑翠鸟",fame:"叫声像人在大笑，是全世界最出名的鸟叫之一。大嘴、深色贯眼纹。",
+    head:"#EFE6D4",beak:straight(48,1.1),uf:"#2A2A30",lf:"#D8CBB3",
+    over:`<path d="M-12 -10 C4 -17 16 -19 34 -13 L34 -6 C18 -10 4 -8 -12 -2 Z" fill="#6B4A32"/>`,
+    eye:{x:20,y:-12,iris:"#5A3A22"},def:["left","ripples","oranje"]}
+};
+
+/* ---------- placement ---------- */
+const POS={
+  tl:{label:"左上",x:4,y:22,r:22},
+  left:{label:"左",x:2,y:54,r:0},
+  bl:{label:"左下 · 面朝右上",x:16,y:84,r:-35}
+};
+
+/* ---------- sound styles (canonical coords) ---------- */
+const WAVES={
+  arcs:{label:"声波弧"},bars:{label:"波形条"},dots:{label:"点"},ripples:{label:"涟漪"},bubble:{label:"气泡"},burst:{label:"喊叫线"},manga:{label:"漫画效果线"}
+};
+function wave(kind,tip,my,c,hole,mono){
+  const ax=tip+(mono?3:7),ay=my,w=mono?5.6:4.2;
+  const st=`fill="none" stroke="${c}" stroke-linecap="round"`;
+  switch(kind){
+    case"arcs":return`<path d="M${ax} ${ay-11} Q${ax+5.5} ${ay} ${ax} ${ay+11}" ${st} stroke-width="${w}"/><path d="M${ax+7.5} ${ay-18} Q${ax+16} ${ay} ${ax+7.5} ${ay+18}" ${st} stroke-width="${w}" opacity="${mono?1:.6}"/>`;
+    case"bars":return[22,34,16].map((h,i)=>`<path d="M${ax+2+i*(mono?9:8)} ${ay-h/2} V${ay+h/2}" ${st} stroke-width="${mono?6.6:5.2}"/>`).join("");
+    case"dots":return[[2,2.3,1],[9.5,3.1,.85],[18,3.9,.65]].map(([dx,r,o])=>`<circle cx="${ax+dx}" cy="${ay}" r="${mono?r*1.2:r}" fill="${c}" opacity="${mono?1:o}"/>`).join("");
+    case"ripples":{const cx=tip-8;return[[15,.95],[23,.62],[31,.35]].map(([r,o])=>{const a=48*Math.PI/180;
+      return`<path d="M${cx+r*Math.cos(a)} ${ay-r*Math.sin(a)} A${r} ${r} 0 0 1 ${cx+r*Math.cos(a)} ${ay+r*Math.sin(a)}" ${st} stroke-width="${mono?4:3}" opacity="${mono?1:o}"/>`}).join("");}
+    case"bubble":return`<rect x="${ax}" y="${ay-24}" width="25" height="17" rx="8.5" fill="${c}"/><path d="M${ax+3} ${ay-10} L${ax-3} ${ay-1} L${ax+10} ${ay-8} Z" fill="${c}"/>`+
+      [6.5,12.5,18.5].map(dx=>`<circle cx="${ax+dx}" cy="${ay-15.5}" r="1.9" fill="${hole}"/>`).join("");
+    case"manga":{const cx=ax-5,lens=[[-44,8,20],[-16,7,24],[12,8,19],[40,9,22]].map(([d,a,z])=>mono?[d,a,z+7]:[d,a,z]),W=mono?6.6:6.4;
+      return lens.map(([d,r0,r1])=>{const a=d*Math.PI/180,ux=Math.cos(a),uy=Math.sin(a),nx=-uy,ny=ux;
+        const p0=[cx+r0*ux,ay+r0*uy],m=[cx+r1*ux,ay+r1*uy];
+        return`<path d="M${p0[0]} ${p0[1]} L${m[0]+nx*W/2} ${m[1]+ny*W/2} Q${m[0]+ux*2.6} ${m[1]+uy*2.6} ${m[0]-nx*W/2} ${m[1]-ny*W/2} Z" fill="${c}"/>`}).join("");}
+    case"burst":return[-34,0,34].map(d=>{const a=d*Math.PI/180;return`<path d="M${ax+3*Math.cos(a)} ${ay+3*Math.sin(a)} L${ax+14*Math.cos(a)} ${ay+14*Math.sin(a)}" ${st} stroke-width="${w}"/>`}).join("");
+  }
+}
+
+/* ---------- render ---------- */
+let uid=0;
+function scene(bk,pk,wk,gk,mono){
+  const b=BIRDS[bk],g=BG[gk],beak=b.beak,R=b.r||40;
+  const p=pk?POS[pk]:{x:0,y:0,r:0};
+  const reach=(beak.tip+30)*Math.cos(p.r*Math.PI/180)+p.x;
+  const s=pk?Math.min(1,96/reach).toFixed(3):1;
+  const C=mono?"currentColor":null;
+  const wc=mono?"currentColor":g.wave, hole=mono?"var(--hole)":g.stops[0];
+  const e=Object.assign({x:20,y:-12},b.eye||{});
+  const id="mk"+(uid++);
+  let eye="";
+  const G=mono&&b.glyph||{};
+  const holeR=G.eyeR||((b.r||40)>42?7.4:6.6);
+  if(mono){eye=mono==="export"?"":`<circle cx="${e.x}" cy="${e.y}" r="${holeR}" fill="var(--hole)"/>`;}
+  else{
+    if(e.ring)eye+=`<circle cx="${e.x}" cy="${e.y}" r="${e.ringR}" fill="${e.ring}"/>`;
+    if(e.iris)eye+=`<circle cx="${e.x}" cy="${e.y}" r="4.6" fill="${e.iris}"/><circle cx="${e.x}" cy="${e.y}" r="2.6" fill="#111"/>`;
+    else eye+=`<circle cx="${e.x}" cy="${e.y}" r="5.2" fill="#1D1D1F"/>`;
+    eye+=`<circle cx="${e.x+1.7}" cy="${e.y-1.7}" r="1.5" fill="#fff"/>`;
+  }
+  const bs=G.bs||1;  /* glyph: bird drawn smaller, sound kept full size */
+  const behind=wk==="ripples"?wave(wk,beak.tip*bs,beak.my*bs,wc,hole,mono):"";
+  const front=wk!=="ripples"?wave(wk,beak.tip*bs,beak.my*bs,wc,hole,mono):"";
+  const bird=`${b.under?(mono?b.under.replace(/fill="[^"]+"/g,'fill="currentColor"'):b.under):""}
+    <path d="${beak.u}" fill="${C||b.uf}"${!mono&&b.bs?` stroke="${b.bs}" stroke-width="1.6" stroke-linejoin="round"`:""}/><path d="${beak.l}" fill="${C||b.lf}"${!mono&&b.bs?` stroke="${b.bs}" stroke-width="1.6" stroke-linejoin="round"`:""}/>
+    <circle class="hd" r="${R}" fill="${C||b.head}"/>${mono?"":`<circle r="${R}" fill="url(#hs)"/><clipPath id="h${id}"><circle r="${R}"/></clipPath><g clip-path="url(#h${id})">${b.over||""}</g>`}
+    ${b.top?(mono?b.top.replace(/fill="[^"]+"/g,'fill="currentColor"'):b.top):""}${eye}`;
+  const mask=mono?`<mask id="${id}" maskUnits="userSpaceOnUse" x="-200" y="-200" width="400" height="400"><rect x="-200" y="-200" width="400" height="400" fill="#fff"/><circle cx="${e.x}" cy="${e.y}" r="${holeR}" fill="#000"/></mask>`:"";
+  const tf=mono?`rotate(${p.r})`:`translate(${p.x} ${p.y}) rotate(${p.r}) scale(${s})`;
+  const inner=`<g transform="${tf}">${mask}${behind}<g ${mono?`mask="url(#${id})"`:""}${bs!==1?` transform="translate(${G.dx||0} 0) scale(${bs})"`:""}>${bird}</g>${front}</g>`;
+  if(mono)return inner;
+  return`<g clip-path="url(#sq)"><rect width="100" height="100" fill="url(#bg-${gk})"/>${g.deco||""}${inner}<rect width="100" height="100" fill="url(#gShine)"/></g>`;
+}
+const icon=(c,size,cls="ic")=>`<svg class="${cls}" width="${size}" height="${size}" viewBox="0 0 100 100" role="img" aria-label="${BIRDS[c[0]].name}">${scene(...c,false)}</svg>`;
+/* menu-bar glyph: same orientation as the app icon, no squircle. fitGlyphs() crops a square around
+   eye + beak + sound, so the head fills the rest of the frame from the same side as in the icon. */
+function glyph(c){
+  return`<svg class="gl" viewBox="0 0 100 100" width="18" height="18" aria-hidden="true"${BIRDS[c[0]].glyph?` data-hx="${BIRDS[c[0]].glyph.hx+(BIRDS[c[0]].glyph.dx||0)}" data-hr="${(BIRDS[c[0]].r||40)*BIRDS[c[0]].glyph.bs+1}"`:""}><g class="fit">${scene(c[0],c[1],c[2],c[3],true)}</g></svg>`;
+}
+function fitGlyphs(root=document){
+  root.querySelectorAll("svg.gl:not([data-fitted])").forEach(sv=>{
+    const g=sv.querySelector("g.fit"),hd=g.querySelector(".hd");
+    hd.style.display="none";const r0=g.getBBox(),bb={x:r0.x,y:r0.y,width:r0.width,height:r0.height};hd.style.display="";
+    /* data-hx: crop through the head's centre so half of it shows; pad for the arcs' stroke */
+    if(sv.dataset.hx){const x1=bb.x+bb.width+3,hr=+sv.dataset.hr,y0=Math.min(bb.y-3,-hr),y1=Math.max(bb.y+bb.height+3,hr);
+      bb.x=+sv.dataset.hx;bb.width=x1-bb.x;bb.y=y0;bb.height=y1-y0;}
+    const side=Math.max(bb.width,bb.height)*1.01,cx=bb.x+bb.width/2,cy=bb.y+bb.height/2;
+    sv.setAttribute("viewBox",`${cx-side/2} ${cy-side/2} ${side} ${side}`);sv.dataset.fitted="1";
+  });
+}
+const tile=(c,size)=>`<button class="tile" data-c="${c.join(",")}" title="${BIRDS[c[0]].name} · ${POS[c[1]].label} · ${WAVES[c[2]].label} · ${BG[c[3]].label}">${icon(c,size)}</button>`;
+
+/* ---------- mixer ---------- */
+const state=[...BIRDS.haan.def].length?["haan",...BIRDS.haan.def]:null;
+function renderMixer(){
+  document.getElementById("hero").innerHTML=icon(state,190,"ic hero");
+  document.getElementById("ladder").innerHTML=[64,32,16].map(s=>`<div>${icon(state,s)}<span class="lbl">${s}</span></div>`).join("");
+  ["g1","g2","g3"].forEach(i=>document.getElementById(i).innerHTML=glyph(state));fitGlyphs(document.querySelector(".mixer"));
+  document.getElementById("bird-desc").textContent=BIRDS[state[0]].nl+" — "+BIRDS[state[0]].fame;
+  [["c-bird",0],["c-pos",1],["c-wave",2],["c-bg",3]].forEach(([id,i])=>
+    document.querySelectorAll(`#${id} .chip`).forEach(ch=>ch.setAttribute("aria-pressed",ch.dataset.v===state[i])));
+}
+function chips(id,obj,i,labelOf,sw){
+  document.getElementById(id).innerHTML=Object.entries(obj).map(([k,v])=>
+    `<button class="chip" data-v="${k}" aria-pressed="false">${sw?`<span class="sw" style="background:linear-gradient(${v.stops[0]},${v.stops[1]})"></span>`:""}${labelOf(v)}</button>`).join("");
+  document.getElementById(id).addEventListener("click",ev=>{const b=ev.target.closest(".chip");if(!b)return;
+    state[i]=b.dataset.v; if(i===0){const d=BIRDS[b.dataset.v].def;state[1]=d[0];state[2]=d[1];state[3]=d[2];} renderMixer();});
+}
+chips("c-bird",BIRDS,0,v=>v.name);
+chips("c-pos",POS,1,v=>v.label);
+chips("c-wave",WAVES,2,v=>v.label);
+chips("c-bg",BG,3,v=>v.label,true);
+
+/* ---------- ship list ---------- */
+const SHIP=[["snavel","left","arcs","blauw","done"],["ara","left","arcs","teal","done"],["beo","bl","bars","paars","done"],
+  ["nachtegaal","bl","ripples","woud","new"],["merel","bl","arcs","schemer","new"],["raaf","tl","manga","papier","new"]];
+document.getElementById("ship").innerHTML=SHIP.map(x=>{const c=x.slice(0,4),b=BIRDS[c[0]];
+  return`<article class="shipcard">${tile(c,112)}<div class="side">
+    <div class="name">${b.name}<span class="state ${x[4]}">${x[4]==="done"?"已选":"本轮修改"}</span></div>
+    <div class="ladder"><div>${icon(c,32)}<span class="lbl">32</span></div><div>${icon(c,16)}<span class="lbl">16</span></div>
+      <div class="zoom" style="flex-direction:column;gap:3px">${glyph(c).replace('width="18" height="18"','width="54" height="54"')}<span class="lbl">菜单栏 3×</span></div></div>
+    <div class="mb"><div class="bar l">${glyph(c)}<span class="clock">do 15 okt 16:40</span></div><div class="bar d">${glyph(c)}<span class="clock">do 15 okt 16:40</span></div></div>
+  </div></article>`}).join("");
+
+/* ---------- birds grid ---------- */
+document.getElementById("birds").innerHTML=Object.entries(BIRDS).map(([k,b])=>{const c=[k,...b.def];
+  return`<article class="bird">${tile(c,84)}<div class="meta"><div class="name">${b.name}</div><div class="nl">${b.nl}</div>
+   <p class="fame">${b.fame}</p>
+   <div class="mb" style="margin-top:8px"><div class="bar l">${glyph(c)}</div><div class="bar d">${glyph(c)}</div></div></div></article>`}).join("");
+
+/* ---------- matrices ---------- */
+function matrix(id,rows,cols,make,rowLabel,colLabel,size){
+  document.getElementById(id).innerHTML=`<table><thead><tr><th></th>${cols.map(c=>`<th>${colLabel(c)}</th>`).join("")}</tr></thead><tbody>`+
+    rows.map(r=>`<tr><th class="rowh">${rowLabel(r)}</th>${cols.map(c=>`<td>${tile(make(r,c),size)}</td>`).join("")}</tr>`).join("")+`</tbody></table>`;
+}
+matrix("m-pos",["ara","beo","haan","grutto"],["tl","left","bl"],(r,c)=>[r,c,"arcs",BIRDS[r].def[2]],r=>BIRDS[r].name,c=>POS[c].label,88);
+matrix("m-wave",["grijs","merel"],Object.keys(WAVES),(r,c)=>[r,"bl",c,r==="merel"?"nacht":"blauw"],r=>BIRDS[r].name,c=>WAVES[c].label,80);
+matrix("m-bg",["snavel","raaf","kookaburra"],Object.keys(BG),(r,c)=>[r,"bl","arcs",c],r=>BIRDS[r].name,c=>BG[c].label,72);
+
+document.addEventListener("click",ev=>{const t=ev.target.closest("button.tile");if(!t)return;
+  t.dataset.c.split(",").forEach((v,i)=>state[i]=v);renderMixer();
+  document.querySelector(".mixer").scrollIntoView({behavior:matchMedia("(prefers-reduced-motion: reduce)").matches?"auto":"smooth",block:"start"});});
+renderMixer();fitGlyphs();
+
+/* ---------- export (open with #export): app icons on Apple's 1024 grid + fitted template glyphs ---------- */
+if(location.hash==="#export"){
+  const defsSrc=document.querySelector("#defs defs").innerHTML;
+  const out={};
+  SHIP.forEach(x=>{const c=x.slice(0,4),id=c[0];
+    out[`icon-${id}.svg`]=`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" width="1024" height="1024"><defs>${defsSrc}<filter id="drop" x="-20%" y="-20%" width="140%" height="140%"><feDropShadow dx="0" dy="10" stdDeviation="12" flood-color="#000" flood-opacity=".3"/></filter></defs><g filter="url(#drop)"><g transform="translate(100 100) scale(8.24)">${scene(...c,false)}</g></g></svg>`;
+    const holder=document.createElement("div");holder.innerHTML=glyph(c);document.body.appendChild(holder);
+    const sv=holder.firstChild;fitGlyphs(holder);
+    const body=scene(c[0],c[1],c[2],c[3],"export").replaceAll("currentColor","#000");
+    out[`menubar-${id}.svg`]=`<svg xmlns="http://www.w3.org/2000/svg" viewBox="${sv.getAttribute("viewBox")}" width="18" height="18">${body}</svg>`;
+    holder.remove();
+  });
+  const pre=document.createElement("pre");pre.id="export";pre.textContent=JSON.stringify(out);document.body.appendChild(pre);
+}
+</script>

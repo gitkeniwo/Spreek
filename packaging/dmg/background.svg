@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="600" height="360" viewBox="0 0 600 360">
+  <!-- DMG window background (packaging/dmg/settings.py places the icons at y=160). -->
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#fbfaf7"/>
+      <stop offset="1" stop-color="#efece6"/>
+    </linearGradient>
+  </defs>
+  <rect width="600" height="360" fill="url(#bg)"/>
+  <g fill="none" stroke="#a3a7af" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M238 160 H352" stroke-dasharray="2 9"/>
+    <path d="M346 146 L362 160 L346 174"/>
+  </g>
+  <text x="300" y="282" text-anchor="middle" font-family="Helvetica Neue, Helvetica, Arial" font-size="15" font-weight="600" fill="#3a3a3c">Drag Spreek into Applications</text>
+  <text x="300" y="306" text-anchor="middle" font-family="Helvetica Neue, Helvetica, Arial" font-size="11" fill="#8e8e93">First launch: System Settings › Privacy &amp; Security › Open Anyway</text>
+</svg>

@@ -1,0 +1,9 @@
+// Copy to Config/Local.xcconfig (git-ignored) to sign Spreek with your own Apple Development
+// certificate, so the Accessibility permission survives rebuilds. See README › Stable signing.
+//
+// Team ID: Xcode › Settings › Accounts › your Apple ID › "(Personal Team)", or
+// `security find-certificate -c "Apple Development" -p | openssl x509 -noout -subject` (the OU= value).
+
+DEVELOPMENT_TEAM = YOURTEAMID
+CODE_SIGN_STYLE = Automatic
+CODE_SIGN_IDENTITY = Apple Development

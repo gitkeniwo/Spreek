@@ -1,0 +1,90 @@
+name: Spreek
+options:
+  bundleIdPrefix: nl.spreek
+  deploymentTarget:
+    macOS: "15.0"
+  createIntermediateGroups: true
+
+settings:
+  base:
+    SWIFT_VERSION: "6.0"
+    MACOSX_DEPLOYMENT_TARGET: "15.0"
+
+packages:
+  SpreekCore:
+    path: Packages/SpreekCore
+  KeyboardShortcuts:
+    url: https://github.com/sindresorhus/KeyboardShortcuts
+    from: "2.4.0"
+
+targets:
+  Spreek:
+    type: application
+    platform: macOS
+    deploymentTarget: "15.0"
+    sources:
+      - App
+    dependencies:
+      - package: SpreekCore
+      - package: KeyboardShortcuts
+    info:
+      path: App/Info.plist
+      properties:
+        CFBundleDisplayName: Spreek
+        CFBundleShortVersionString: $(MARKETING_VERSION)
+        CFBundleVersion: $(CURRENT_PROJECT_VERSION)
+        LSUIElement: true
+        LSApplicationCategoryType: public.app-category.education
+        NSHumanReadableCopyright: ""
+        NSServices:
+          - NSMenuItem:
+              default: Speak with Spreek
+            NSMessage: speakWithSpreek
+            NSPortName: Spreek
+            NSSendTypes:
+              - NSStringPboardType
+              - public.utf8-plain-text
+            NSRequiredContext: {}
+        # Sentences dragged from the dashboard list onto sidebar folders and tags.
+        UTExportedTypeDeclarations:
+          - UTTypeIdentifier: nl.spreek.sentence-ids
+            UTTypeDescription: Spreek Sentences
+            UTTypeConformsTo:
+              - public.data
+    # Signing lives in Config/Base.xcconfig (ad-hoc), optionally overridden by the
+    # git-ignored Config/Local.xcconfig. Don't set CODE_SIGN_* here: target settings
+    # would win over the xcconfig.
+    configFiles:
+      Debug: Config/Base.xcconfig
+      Release: Config/Base.xcconfig
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: nl.spreek.app
+        PRODUCT_NAME: Spreek
+        # scripts/release.sh sets this to the version being released and passes the commit
+        # count as CURRENT_PROJECT_VERSION.
+        MARKETING_VERSION: "0.2.0"
+        CURRENT_PROJECT_VERSION: "1"
+        GENERATE_INFOPLIST_FILE: NO
+        ENABLE_APP_SANDBOX: NO
+        ENABLE_HARDENED_RUNTIME: NO
+        SWIFT_STRICT_CONCURRENCY: complete
+        ENABLE_PREVIEWS: YES
+        COMBINE_HIDPI_IMAGES: YES
+        # Rendered by scripts/render-icon.swift.
+        ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
+      configs:
+        # Own bundle ID, so the Xcode build and the installed release don't share (and
+        # overwrite) one Accessibility entry.
+        Debug:
+          PRODUCT_BUNDLE_IDENTIFIER: nl.spreek.app.debug
+
+schemes:
+  Spreek:
+    build:
+      targets:
+        Spreek: all
+    run:
+      config: Debug
+    archive:
+      config: Release
