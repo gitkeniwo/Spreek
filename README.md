@@ -1,4 +1,8 @@
-# Spreek
+<p align="center">
+  <img src="art/icons/icon-snavel.svg" width="160" height="160" alt="Spreek icon">
+</p>
+
+<h1 align="center">Spreek</h1>
 
 Select-to-speak for language learners, in your Mac's menu bar. Select text in any app, press **⌥S**, and Spreek detects the language, reads it aloud with a natural neural voice and keeps the sentence in a history you can sort into favorites, folders, tags and notes.
 
