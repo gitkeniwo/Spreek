@@ -1,3 +1,4 @@
+import NaturalLanguage
 import Testing
 @testable import SpreekCore
 
@@ -137,7 +138,19 @@ import Testing
 
     /// "Kind" scores ~0.53 nl / ~0.47 de: a tie, so the preference decides. (With English
     /// enabled it reads as English, so this uses the original four languages.)
-    @Test(arguments: [LanguageCode.nl, .de])
+    /// Needs a system language model that scores "Kind" as a near-tie; other macOS versions (such
+    /// as CI images) score it differently, and then there is no tie to exercise.
+    static let kindIsANlDeTie: Bool = {
+        let recognizer = NLLanguageRecognizer()
+        recognizer.languageConstraints = [.dutch, .german, .japanese, .korean]
+        recognizer.processString("Kind")
+        let scores = recognizer.languageHypotheses(withMaximum: 4)
+        guard let nl = scores[.dutch], let de = scores[.german] else { return false }
+        return abs(nl - de) < LanguageDetector.tieMargin
+            && scores.filter { ![.dutch, .german].contains($0.key) }.allSatisfy { $0.value < min(nl, de) }
+    }()
+
+    @Test(.enabled(if: LanguageDetectorTests.kindIsANlDeTie), arguments: [LanguageCode.nl, .de])
     func nlDeTieUsesPreference(preferred: LanguageCode) {
         let result = LanguageDetector.detect("Kind", enabled: [.nl, .de, .ja, .ko], preferOnNLDETie: preferred)
         #expect(result.language == preferred)
