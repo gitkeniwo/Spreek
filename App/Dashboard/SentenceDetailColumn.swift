@@ -91,6 +91,7 @@ private struct SentenceDetail: View {
                     }
                 }
                 .padding(EdgeInsets(top: 14, leading: 16, bottom: 20, trailing: 16))
+                .overlayScrollers()
             }
         }
         .confirmationDialog("Delete this sentence?", isPresented: $confirmDelete) {

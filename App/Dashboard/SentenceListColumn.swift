@@ -61,6 +61,7 @@ struct SentenceListColumn: View {
                     }
                     .padding(.horizontal, 8)
                     .padding(.bottom, 8)
+                    .overlayScrollers()
                 }
                 .overlay {
                     if sentences.isEmpty { emptyState }
