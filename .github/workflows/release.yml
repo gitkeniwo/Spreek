@@ -95,6 +95,7 @@ jobs:
         run: brew install xcodegen librsvg uv
 
       - name: Import the signing certificate
+        timeout-minutes: 5
         env:
           SPREEK_CERT_P12: ${{ secrets.SPREEK_CERT_P12 }}
           SPREEK_CERT_PASSWORD: ${{ secrets.SPREEK_CERT_PASSWORD }}
@@ -109,19 +110,16 @@ jobs:
           security create-keychain -p "$keychain_password" "$SPREEK_KEYCHAIN"
           security set-keychain-settings -t 3600 "$SPREEK_KEYCHAIN"
           security unlock-keychain -p "$keychain_password" "$SPREEK_KEYCHAIN"
+          echo "Importing the certificate"
           security import "$p12" -k "$SPREEK_KEYCHAIN" -P "$SPREEK_CERT_PASSWORD" -T /usr/bin/codesign
+          echo "Allowing codesign to use the key"
           security set-key-partition-list -S apple-tool:,apple:,codesign: -s -k "$keychain_password" "$SPREEK_KEYCHAIN" >/dev/null
           # Put the keychain on the search list, keeping the existing ones.
           existing=$(security list-keychains -d user | tr -d '"')
           # shellcheck disable=SC2086
           security list-keychains -d user -s "$SPREEK_KEYCHAIN" $existing
-          # If codesign would reject the self-signed identity as untrusted, trust it in this
-          # temporary keychain only.
-          if ! security find-identity -v -p codesigning "$SPREEK_KEYCHAIN" | grep -q "Spreek Self-Signed"; then
-            echo "Identity not valid yet; trusting it for code signing in the temporary keychain"
-            security find-certificate -c "Spreek Self-Signed" -p "$SPREEK_KEYCHAIN" > "$RUNNER_TEMP/spreek-cert.pem"
-            security add-trusted-cert -p codeSign -k "$SPREEK_KEYCHAIN" "$RUNNER_TEMP/spreek-cert.pem"
-          fi
+          # Self-signed, so the identity is listed but not "valid". codesign signs with it anyway.
+          # (No add-trusted-cert: on a runner it waits for an interactive authorization.)
           security find-identity -p codesigning "$SPREEK_KEYCHAIN"
           rm -f "$p12" "$RUNNER_TEMP/spreek-cert.pem"
 
