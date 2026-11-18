@@ -63,7 +63,7 @@ targets:
         PRODUCT_NAME: Spreek
         # scripts/release.sh writes the version being released here; scripts/build-release.sh
         # passes 1000 + the commit count as CURRENT_PROJECT_VERSION.
-        MARKETING_VERSION: "0.2.0"
+        MARKETING_VERSION: "0.3.0"
         CURRENT_PROJECT_VERSION: "1"
         GENERATE_INFOPLIST_FILE: NO
         ENABLE_APP_SANDBOX: NO
