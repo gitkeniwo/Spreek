@@ -1,0 +1,222 @@
+name: Release
+
+# Pushing a tag vX.Y.Z (scripts/release.sh) builds, signs and publishes that version.
+# Started by hand it only does a dry run: it builds the DMG and uploads it as a workflow artifact.
+on:
+  push:
+    tags: ['v*.*.*']
+  workflow_dispatch:
+    inputs:
+      version:
+        description: Version to build, X.Y.Z (it must be on the ref you run this from)
+        required: true
+        type: string
+      dry_run:
+        description: Only build the DMG and upload it as an artifact; publish nothing
+        required: true
+        default: true
+        type: boolean
+
+permissions:
+  contents: read
+
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+
+env:
+  SOURCE_REPO: gitkeniwo/Spreek
+  TAP_REPO: gitkeniwo/homebrew-spreek
+
+jobs:
+  # Tests, no secrets.
+  verify:
+    name: Verify
+    runs-on: macos-26
+    timeout-minutes: 30
+    outputs:
+      version: ${{ steps.version.outputs.version }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+
+      - name: Check the version
+        id: version
+        env:
+          REF_TYPE: ${{ github.ref_type }}
+          REF_NAME: ${{ github.ref_name }}
+          INPUT_VERSION: ${{ inputs.version }}
+        run: |
+          marketing=$(sed -n 's/^ *MARKETING_VERSION: "\(.*\)"$/\1/p' project.yml)
+          if [[ $REF_TYPE == tag ]]; then
+            version=${REF_NAME#v}
+            [[ $REF_NAME == "v$marketing" ]] || { echo "::error::tag $REF_NAME does not match MARKETING_VERSION $marketing"; exit 1; }
+          else
+            version=$INPUT_VERSION
+            [[ $version =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]] || { echo "::error::version must be X.Y.Z"; exit 1; }
+          fi
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+          echo "Releasing $version (MARKETING_VERSION in project.yml: $marketing)"
+
+      - name: Select Xcode 26
+        run: |
+          xcode=$(printf '%s\n' /Applications/Xcode_26*.app | sort -V | tail -n 1)
+          sudo xcode-select -s "$xcode"
+          xcodebuild -version
+
+      - name: Install XcodeGen
+        run: brew install xcodegen
+
+      - name: Verify
+        run: scripts/verify.sh
+
+  # Signed build. The signing secrets live in the "release" environment.
+  build:
+    name: Build and sign
+    needs: verify
+    runs-on: macos-26
+    timeout-minutes: 45
+    environment: release
+    env:
+      VERSION: ${{ needs.verify.outputs.version }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0 # the build number is 1000 + the commit count
+
+      - name: Select Xcode 26
+        run: |
+          xcode=$(printf '%s\n' /Applications/Xcode_26*.app | sort -V | tail -n 1)
+          sudo xcode-select -s "$xcode"
+          xcodebuild -version
+
+      - name: Install tools
+        run: brew install xcodegen librsvg uv
+
+      - name: Import the signing certificate
+        env:
+          SPREEK_CERT_P12: ${{ secrets.SPREEK_CERT_P12 }}
+          SPREEK_CERT_PASSWORD: ${{ secrets.SPREEK_CERT_PASSWORD }}
+        run: |
+          set -euo pipefail
+          SPREEK_KEYCHAIN="$RUNNER_TEMP/spreek-signing.keychain-db"
+          echo "SPREEK_KEYCHAIN=$SPREEK_KEYCHAIN" >> "$GITHUB_ENV"
+          keychain_password=$(openssl rand -hex 24)
+          echo "::add-mask::$keychain_password"
+          p12="$RUNNER_TEMP/spreek-cert.p12"
+          printf '%s' "$SPREEK_CERT_P12" | base64 --decode > "$p12"
+          security create-keychain -p "$keychain_password" "$SPREEK_KEYCHAIN"
+          security set-keychain-settings -t 3600 "$SPREEK_KEYCHAIN"
+          security unlock-keychain -p "$keychain_password" "$SPREEK_KEYCHAIN"
+          security import "$p12" -k "$SPREEK_KEYCHAIN" -P "$SPREEK_CERT_PASSWORD" -T /usr/bin/codesign
+          security set-key-partition-list -S apple-tool:,apple:,codesign: -s -k "$keychain_password" "$SPREEK_KEYCHAIN" >/dev/null
+          # Put the keychain on the search list, keeping the existing ones.
+          existing=$(security list-keychains -d user | tr -d '"')
+          # shellcheck disable=SC2086
+          security list-keychains -d user -s "$SPREEK_KEYCHAIN" $existing
+          # If codesign would reject the self-signed identity as untrusted, trust it in this
+          # temporary keychain only.
+          if ! security find-identity -v -p codesigning "$SPREEK_KEYCHAIN" | grep -q "Spreek Self-Signed"; then
+            echo "Identity not valid yet; trusting it for code signing in the temporary keychain"
+            security find-certificate -c "Spreek Self-Signed" -p "$SPREEK_KEYCHAIN" > "$RUNNER_TEMP/spreek-cert.pem"
+            security add-trusted-cert -p codeSign -k "$SPREEK_KEYCHAIN" "$RUNNER_TEMP/spreek-cert.pem"
+          fi
+          security find-identity -p codesigning "$SPREEK_KEYCHAIN"
+          rm -f "$p12" "$RUNNER_TEMP/spreek-cert.pem"
+
+      - name: Build, sign and make the DMG
+        run: scripts/build-release.sh "$VERSION"
+
+      - name: Designated requirement
+        run: codesign -dr - build/release/stage/Spreek.app
+
+      - name: Upload the DMG
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: Spreek-${{ needs.verify.outputs.version }}-dmg
+          path: build/release/Spreek-${{ needs.verify.outputs.version }}.dmg
+          if-no-files-found: error
+          retention-days: ${{ github.ref_type == 'tag' && 30 || 7 }}
+
+      - name: Delete the temporary keychain
+        if: always()
+        run: |
+          security delete-keychain "$RUNNER_TEMP/spreek-signing.keychain-db" || true
+          rm -f "$RUNNER_TEMP/spreek-cert.p12" "$RUNNER_TEMP/spreek-cert.pem"
+
+  # GitHub release and cask. Only for real releases from a tag.
+  publish:
+    name: Publish
+    needs: [verify, build]
+    if: github.ref_type == 'tag' && !(github.event_name == 'workflow_dispatch' && inputs.dry_run)
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    environment: release
+    permissions:
+      contents: write
+    env:
+      VERSION: ${{ needs.verify.outputs.version }}
+      TAG: ${{ github.ref_name }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Download the DMG
+        uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+        with:
+          name: Spreek-${{ needs.verify.outputs.version }}-dmg
+          path: dist
+
+      - name: Create the GitHub release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          # Annotated tag message = "Changes" (empty for lightweight tags).
+          ref=$(gh api "repos/$SOURCE_REPO/git/ref/tags/$TAG")
+          if [[ $(jq -r .object.type <<<"$ref") == tag ]]; then
+            message=$(gh api "repos/$SOURCE_REPO/git/tags/$(jq -r .object.sha <<<"$ref")" --jq .message)
+          else
+            message=""
+          fi
+          {
+            echo "## Install"
+            echo
+            echo '```sh'
+            echo "brew install --cask gitkeniwo/spreek/spreek"
+            echo '```'
+            echo
+            echo "Or download **Spreek-$VERSION.dmg** below, open it and drag Spreek into Applications."
+            echo
+            echo "Spreek isn't notarized: the first time you open it, macOS blocks it. Go to"
+            echo "**System Settings › Privacy & Security**, find *\"Spreek\" was blocked…* and click **Open Anyway**."
+            echo
+            echo "Requires macOS 15 (Sequoia) or later; Apple silicon and Intel."
+            if [[ -n $message && $message != "Spreek $VERSION" ]]; then
+              echo
+              echo "## Changes"
+              echo
+              printf '%s\n' "$message"
+            fi
+          } > notes.md
+          gh release create "$TAG" "dist/Spreek-$VERSION.dmg" \
+            --repo "$SOURCE_REPO" --verify-tag --title "Spreek $VERSION" --notes-file notes.md
+
+      - name: Update the cask in the tap
+        env:
+          GH_TOKEN: ${{ secrets.TAP_TOKEN }}
+        run: |
+          set -euo pipefail
+          sha256=$(shasum -a 256 "dist/Spreek-$VERSION.dmg" | cut -d' ' -f1)
+          gh auth setup-git
+          gh repo clone "$TAP_REPO" tap -- --quiet --depth 1
+          mkdir -p tap/Casks
+          sed -e "s/@VERSION@/$VERSION/" -e "s/@SHA256@/$sha256/" -e "s|@SOURCE_REPO@|$SOURCE_REPO|g" \
+            packaging/homebrew/spreek.rb.in > tap/Casks/spreek.rb
+          git -C tap config user.name "github-actions[bot]"
+          git -C tap config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git -C tap add Casks/spreek.rb
+          git -C tap commit -q -m "spreek $VERSION"
+          git -C tap push -q origin HEAD

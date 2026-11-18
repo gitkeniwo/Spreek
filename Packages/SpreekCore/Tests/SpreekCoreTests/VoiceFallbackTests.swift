@@ -728,10 +728,11 @@ private struct Rig {
     }
 
     @Test func everyTurnGetsItsOwnTimeout() async throws {
-        // Two chunks take 0.16 s (under the 0.2 s limit): together they exceed it.
+        // Each chunk takes about 0.6 s (under the 1 s limit, with room for a slow CI runner): together
+        // the two take about 1.2 s and exceed it.
         let turn = Self.sentenceTurn(text: "Hoi.")
-        let transport = ReplayTransport(turns: [turn, turn], delay: .milliseconds(40))
-        let provider = EdgeNativeProvider(transport: transport, timeout: 0.2, workDirectory: temporaryDirectory("Native"))
+        let transport = ReplayTransport(turns: [turn, turn], delay: .milliseconds(150))
+        let provider = EdgeNativeProvider(transport: transport, timeout: 1.0, workDirectory: temporaryDirectory("Native"))
         let half = String(repeating: "Hoi dag. ", count: 300)
         let result = try await provider.synthesize(SpeechRequest(text: half + "\n" + half, language: .nl, boundaryMode: .sentence))
         defer { try? FileManager.default.removeItem(at: result.audioURL) }

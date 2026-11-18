@@ -2,10 +2,10 @@ cask "spreek" do
   version "@VERSION@"
   sha256 "@SHA256@"
 
-  url "https://github.com/@TAP_REPO@/releases/download/v#{version}/Spreek-#{version}.dmg"
+  url "https://github.com/@SOURCE_REPO@/releases/download/v#{version}/Spreek-#{version}.dmg"
   name "Spreek"
   desc "Menu bar select-to-speak for language learners"
-  homepage "https://github.com/@TAP_REPO@"
+  homepage "https://github.com/@SOURCE_REPO@"
 
   livecheck do
     url :url

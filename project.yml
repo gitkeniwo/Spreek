@@ -61,8 +61,8 @@ targets:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: nl.spreek.app
         PRODUCT_NAME: Spreek
-        # scripts/release.sh sets this to the version being released and passes the commit
-        # count as CURRENT_PROJECT_VERSION.
+        # scripts/release.sh writes the version being released here; scripts/build-release.sh
+        # passes 1000 + the commit count as CURRENT_PROJECT_VERSION.
         MARKETING_VERSION: "0.2.0"
         CURRENT_PROJECT_VERSION: "1"
         GENERATE_INFOPLIST_FILE: NO
